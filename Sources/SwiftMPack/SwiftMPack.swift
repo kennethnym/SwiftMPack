@@ -52,6 +52,21 @@ struct MPWriter {
         mpack_write_i64(writer, int)
     }
     
+    mutating func write(uint: UInt) {
+        switch MemoryLayout<UInt>.size {
+        case 8:
+            mpack_write_u8(writer, UInt8(uint))
+        case 16:
+            mpack_write_u16(writer, UInt16(uint))
+        case 32:
+            mpack_write_u32(writer, UInt32(uint))
+        case 64:
+            mpack_write_u64(writer, UInt64(uint))
+        default:
+            fatalError("Unsupported integer size")
+        }
+    }
+    
     mutating func write(uint: UInt8) {
         mpack_write_u8(writer, uint)
     }
