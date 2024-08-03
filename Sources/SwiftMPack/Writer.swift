@@ -26,7 +26,7 @@ struct MPWriter {
     }
     
     mutating func completeArray() {
-        mpack_build_array(writer)
+        mpack_complete_array(writer)
     }
     
     mutating func write(int: Int) {
