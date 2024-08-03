@@ -17,6 +17,7 @@ class MPTreeReader {
             }
         }
         guard mpack_tree_try_parse(&tree) else {
+            mpack_tree_destroy(&tree)
             return nil
         }
         root = mpack_tree_root(&tree)
