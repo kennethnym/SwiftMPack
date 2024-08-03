@@ -118,6 +118,7 @@ class MPKeyedEncodingContainer<Key: CodingKey>: KeyedEncodingContainerProtocol {
     }
     
     func encode<T>(_ value: T, forKey key: Key) throws where T: Encodable {
+        writer.write(string: key.stringValue)
         try value.encode(to: encoder)
     }
     
