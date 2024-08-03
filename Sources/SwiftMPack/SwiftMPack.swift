@@ -21,6 +21,14 @@ struct MPWriter {
         mpack_complete_map(writer)
     }
     
+    mutating func beginArray() {
+        mpack_build_array(writer)
+    }
+    
+    mutating func completeArray() {
+        mpack_build_array(writer)
+    }
+    
     mutating func write(int: Int) {
         switch MemoryLayout<Int>.size {
         case 8:
