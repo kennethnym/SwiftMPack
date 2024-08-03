@@ -7,13 +7,13 @@ class MPTreeReader {
     private(set) var root = Node()
 
     private var tree = mpack_tree_t()
-    private let bytes: [UInt8]
+    private let data: Data
 
-    init?(readFrom bytes: [UInt8]) {
-        self.bytes = bytes
-        self.bytes.withUnsafeBufferPointer {
+    init?(readFrom data: Data) {
+        self.data = data
+        self.data.withUnsafeBytes {
             $0.withMemoryRebound(to: CChar.self) { ptr in
-                mpack_tree_init_data(&tree, ptr.baseAddress, ptr.count)
+                mpack_tree_init(&tree, ptr.baseAddress, ptr.count)
             }
         }
         guard mpack_tree_try_parse(&tree) else {

@@ -8,16 +8,17 @@ class MPDecoder: Decoder {
     fileprivate let reader: MPTreeReader
     fileprivate var codingNodes: [MPTreeReader.Node] = []
     
-    static func decode<T: Decodable>(_ type: T.Type, from bytes: [UInt8]) throws -> T {
-        guard let reader = MPTreeReader(readFrom: bytes) else {
+    static func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
+        guard let reader = MPTreeReader(readFrom: data) else {
             throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Unable to decode: invalid mpack data!!"))
         }
-        let decoder = MPDecoder(startingFrom: reader.root, readingFrom: reader)
+        let decoder = MPDecoder(from: reader)
         return try .init(from: decoder)
     }
 
-    init(startingFrom node: MPTreeReader.Node, readingFrom reader: MPTreeReader) { self.reader = reader
-        codingNodes.append(node)
+    fileprivate init(from reader: MPTreeReader) {
+        self.reader = reader
+        codingNodes.append(reader.root)
     }
     
     func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
