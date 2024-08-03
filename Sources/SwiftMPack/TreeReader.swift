@@ -201,7 +201,7 @@ class MPTreeReader {
         let data = Data(bytes: ptr, count: len)
         return String(data: data, encoding: .utf8)
     }
-    
+
     func readInArray(_ i: Int, in arrayNode: Node) -> Node {
         mpack_node_array_at(arrayNode, i)
     }

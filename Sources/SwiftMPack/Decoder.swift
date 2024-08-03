@@ -1,3 +1,4 @@
+import CMPack
 import Foundation
 
 class MPDecoder: Decoder {
@@ -14,9 +15,8 @@ class MPDecoder: Decoder {
         let decoder = MPDecoder(startingFrom: reader.root, readingFrom: reader)
         return try .init(from: decoder)
     }
-    
-    init(startingFrom node: MPTreeReader.Node, readingFrom reader: MPTreeReader) {
-        self.reader = reader
+
+    init(startingFrom node: MPTreeReader.Node, readingFrom reader: MPTreeReader) { self.reader = reader
         codingNodes.append(node)
     }
     
@@ -29,7 +29,7 @@ class MPDecoder: Decoder {
     }
     
     func singleValueContainer() throws -> any SingleValueDecodingContainer {
-        fatalError()
+        MPSingleValueDecodingContainer(referencing: self)
     }
 }
 
@@ -265,4 +265,106 @@ class MPUnkeyedDecodingContainer: UnkeyedDecodingContainer {
     }
     
     func superDecoder() throws -> any Decoder { decoder }
+}
+
+class MPSingleValueDecodingContainer: SingleValueDecodingContainer {
+    let codingPath: [any CodingKey] = []
+    
+    private let decoder: MPDecoder
+    private let currentNode: MPTreeReader.Node
+    
+    init(referencing decoder: MPDecoder) {
+        self.decoder = decoder
+        self.currentNode = decoder.codingNodes.last!
+    }
+    
+    deinit {
+        decoder.codingNodes.removeLast()
+    }
+    
+    func decodeNil() -> Bool {
+        mpack_node_is_nil(currentNode)
+    }
+    
+    func decode(_ type: Bool.Type) throws -> Bool {
+        mpack_node_bool(currentNode)
+    }
+    
+    func decode(_ type: String.Type) throws -> String {
+        guard let cstr = mpack_node_str(currentNode) else {
+            throw DecodingError.dataCorruptedError(in: self, debugDescription: "Unable to decode single value as string: invalid string!")
+        }
+        let cstrLen = mpack_node_strlen(currentNode)
+        let data = Data(bytes: cstr, count: cstrLen)
+        guard let str = String(data: data, encoding: .utf8) else {
+            throw DecodingError.dataCorruptedError(in: self, debugDescription: "Unable to decode single value as string: invalid string!")
+        }
+        return str
+    }
+    
+    func decode(_ type: Double.Type) throws -> Double {
+        mpack_node_double(currentNode)
+    }
+    
+    func decode(_ type: Float.Type) throws -> Float {
+        mpack_node_float(currentNode)
+    }
+    
+    func decode(_ type: Int.Type) throws -> Int {
+        let num: any SignedInteger = switch MemoryLayout<Int>.size {
+        case 8: mpack_node_i8(currentNode)
+        case 16: mpack_node_i16(currentNode)
+        case 32: mpack_node_i32(currentNode)
+        case 64: mpack_node_i64(currentNode)
+        default: fatalError()
+        }
+        return Int(num)
+    }
+    
+    func decode(_ type: Int8.Type) throws -> Int8 {
+        mpack_node_i8(currentNode)
+    }
+    
+    func decode(_ type: Int16.Type) throws -> Int16 {
+        mpack_node_i16(currentNode)
+    }
+    
+    func decode(_ type: Int32.Type) throws -> Int32 {
+        mpack_node_i32(currentNode)
+    }
+    
+    func decode(_ type: Int64.Type) throws -> Int64 {
+        mpack_node_i64(currentNode)
+    }
+    
+    func decode(_ type: UInt.Type) throws -> UInt {
+        let num: any UnsignedInteger = switch MemoryLayout<UInt>.size {
+        case 8: mpack_node_u8(currentNode)
+        case 16: mpack_node_u16(currentNode)
+        case 32: mpack_node_u32(currentNode)
+        case 64: mpack_node_u64(currentNode)
+        default: fatalError()
+        }
+        return UInt(num)
+    }
+    
+    func decode(_ type: UInt8.Type) throws -> UInt8 {
+        mpack_node_u8(currentNode)
+    }
+    
+    func decode(_ type: UInt16.Type) throws -> UInt16 {
+        mpack_node_u16(currentNode)
+    }
+    
+    func decode(_ type: UInt32.Type) throws -> UInt32 {
+        mpack_node_u32(currentNode)
+    }
+    
+    func decode(_ type: UInt64.Type) throws -> UInt64 {
+        mpack_node_u64(currentNode)
+    }
+    
+    func decode<T>(_ type: T.Type) throws -> T where T: Decodable {
+        try .init(from: decoder)
+    }
 }
