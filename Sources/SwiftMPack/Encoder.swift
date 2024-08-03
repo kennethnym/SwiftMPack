@@ -148,6 +148,10 @@ class MPUnkeyedEncodingContainer: UnkeyedEncodingContainer {
         self.writer.beginArray()
     }
     
+    deinit {
+        self.writer.completeArray()
+    }
+    
     func encodeNil() throws {
         writer.writeNil()
     }
