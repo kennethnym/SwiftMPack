@@ -111,20 +111,29 @@ struct MPWriter {
         mpack_write_nil(writer)
     }
     
-    mutating func getBytesAndDestroy() -> [UInt8]? {
+    mutating func getDataAndDestroy() -> Data? {
         let error = mpack_writer_destroy(writer)
         if error != mpack_ok {
             return nil
         }
         
-        let bufBegin = bufferPtr.pointee?.withMemoryRebound(to: UInt8.self, capacity: 1) { $0 }
-        let ptr = UnsafeBufferPointer(start: bufBegin, count: size.pointee)
+        guard let buffer = bufferPtr.pointee else {
+            return nil
+        }
+        
+        let data = Data(
+            bytesNoCopy: buffer.withMemoryRebound(to: UInt8.self, capacity: size.pointee) { $0 },
+            count: size.pointee,
+            deallocator: .custom { ptr, _ in
+                ptr.deallocate()
+            }
+        )
         
         bufferPtr.deallocate()
         size.deallocate()
         writer.deallocate()
         
-        return Array(ptr)
+        return data
     }
 }
 

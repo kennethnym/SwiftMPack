@@ -7,10 +7,10 @@ class MPEncoder: Encoder {
     
     fileprivate var writer = MPWriter()
     
-    static func encode<T: Encodable>(_ value: T) throws -> [UInt8]? {
+    static func encode<T: Encodable>(_ value: T) throws -> Data? {
         let encoder = MPEncoder()
         try value.encode(to: encoder)
-        return encoder.writer.getBytesAndDestroy()
+        return encoder.writer.getDataAndDestroy()
     }
     
     func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key: CodingKey {
