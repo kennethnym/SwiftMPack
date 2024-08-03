@@ -5,11 +5,10 @@ struct MPWriter {
     typealias Buffer = UnsafeMutablePointer<CChar>
     
     private var writer = UnsafeMutablePointer<mpack_writer_t>.allocate(capacity: 1)
-    private var bufferPtr: UnsafeMutablePointer<Buffer?>
+    private var bufferPtr = UnsafeMutablePointer<Buffer?>.allocate(capacity: 1)
     private var size = UnsafeMutablePointer<Int>.allocate(capacity: 1)
 
     init() {
-        bufferPtr = UnsafeMutablePointer<Buffer?>.allocate(capacity: 1)
         mpack_writer_init_growable(writer, bufferPtr, size)
     }
     
@@ -134,11 +133,5 @@ struct MPWriter {
         writer.deallocate()
         
         return data
-    }
-}
-
-extension MPWriter.Buffer {
-    static func create() -> MPWriter.Buffer {
-        return MPWriter.Buffer.allocate(capacity: 1)
     }
 }
