@@ -127,7 +127,7 @@ class MPKeyedEncodingContainer<Key: CodingKey>: KeyedEncodingContainerProtocol {
     }
     
     func nestedUnkeyedContainer(forKey key: Key) -> any UnkeyedEncodingContainer {
-        fatalError()
+        return MPUnkeyedEncodingContainer(referencing: encoder, writingTo: writer)
     }
     
     func superEncoder() -> any Encoder { superEncoder(forKey: .init(stringValue: "super")!) }
