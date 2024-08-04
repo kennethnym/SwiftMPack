@@ -7,10 +7,13 @@ class MPEncoder: Encoder {
     
     fileprivate var writer = MPWriter()
     
-    static func encode<T: Encodable>(_ value: T) throws -> Data? {
+    static func encode<T: Encodable>(_ value: T) throws -> Data {
         let encoder = MPEncoder()
         try value.encode(to: encoder)
-        return encoder.writer.getDataAndDestroy()
+        guard let data = encoder.writer.getDataAndDestroy() else {
+            throw MPError.unknownEncodingError
+        }
+        return data
     }
     
     func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key: CodingKey {
