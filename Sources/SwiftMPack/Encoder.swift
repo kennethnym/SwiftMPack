@@ -1,5 +1,6 @@
 import Foundation
 
+/// An ``Encoder`` that encodes ``Encodable`` types into msgpack-serialized bytes.
 class MPEncoder: Encoder {
     var codingPath: [any CodingKey] = []
     
@@ -7,6 +8,22 @@ class MPEncoder: Encoder {
     
     fileprivate var writer = MPWriter()
     
+    /// Encodes the given ``Encodable`` value into msgpack-serialized ``Data``.
+    ///
+    /// Example:
+    /// ```swift
+    /// struct Person: Encodable {
+    ///     let name: String
+    /// }
+    ///
+    /// let person = Person(name: "mai sakurajima")
+    /// // data will be the person serialized as a msgpack message.
+    /// let data = try MPEncoder.encode(person)
+    /// ```
+    ///
+    /// - parameter value: The value to be encoded
+    ///
+    /// - returns: The value serialized as msgpack ``Data``.
     static func encode<T: Encodable>(_ value: T) throws -> Data {
         let encoder = MPEncoder()
         try value.encode(to: encoder)

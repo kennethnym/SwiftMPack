@@ -1,6 +1,7 @@
 import CMPack
 import Foundation
 
+/// A ``Decoder`` that decodes msgpack-serialized bytes into ``Decodable`` structs.
 class MPDecoder: Decoder {
     let codingPath: [any CodingKey] = []
     let userInfo: [CodingUserInfoKey: Any] = [:]
@@ -8,6 +9,22 @@ class MPDecoder: Decoder {
     fileprivate let reader: MPTreeReader
     fileprivate var codingNodes: [MPTreeReader.Node] = []
     
+    /// Decodes the given msgpack-formatted bytes into the given ``Decodable`` type.
+    ///
+    /// Example:
+    ///
+    /// ```swift
+    /// struct Person: Decodable {
+    ///     let name: String
+    /// }
+    ///
+    /// let person = try MPData.decode(Person.self, from: serializedPersonData)
+    /// ```
+    ///
+    /// - parameter type: The Decodable type to decode into.
+    /// - parameter data: The msgpack-formatted ``Data`` to be decoded.
+    ///
+    /// - returns: The decoded data in the given type.
     static func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
         guard let reader = MPTreeReader(readFrom: data) else {
             throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Unable to decode: invalid mpack data!!"))
