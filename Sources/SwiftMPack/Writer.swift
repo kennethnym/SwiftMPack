@@ -53,24 +53,9 @@ struct MPWriter {
         mpack_complete_array(writer)
     }
     
-    /// Writes the given int to the buffer.
-    ///
-    /// The size of the int in the buffer depends
-    /// on the native word size of the int of the platform the code will be running on.
-    /// On a 32-bit platform, the size will be 4 bytes. On a 64-bit platform, the size will be 8 bytes.
+    /// Writes the given ``Int`` to the buffer using the smallest space possible.
     mutating func write(int: Int) {
-        switch MemoryLayout<Int>.size {
-        case 8:
-            mpack_write_i8(writer, Int8(int))
-        case 16:
-            mpack_write_i16(writer, Int16(int))
-        case 32:
-            mpack_write_i32(writer, Int32(int))
-        case 64:
-            mpack_write_i64(writer, Int64(int))
-        default:
-            fatalError("Unsupported integer size")
-        }
+        mpack_write_int(writer, Int64(int))
     }
     
     mutating func write(int: Int8) {
@@ -89,24 +74,9 @@ struct MPWriter {
         mpack_write_i64(writer, int)
     }
     
-    /// Writes the given uint to the buffer.
-    ///
-    /// The size of the uint in the buffer depends
-    /// on the native word size of the uint of the platform the code will be running on.
-    /// On a 32-bit platform, the size will be 4 bytes. On a 64-bit platform, the size will be 8 bytes.
+    /// Writes the given uint to the buffer using the smallest space possible.
     mutating func write(uint: UInt) {
-        switch MemoryLayout<UInt>.size {
-        case 8:
-            mpack_write_u8(writer, UInt8(uint))
-        case 16:
-            mpack_write_u16(writer, UInt16(uint))
-        case 32:
-            mpack_write_u32(writer, UInt32(uint))
-        case 64:
-            mpack_write_u64(writer, UInt64(uint))
-        default:
-            fatalError("Unsupported integer size")
-        }
+        mpack_write_uint(writer, UInt64(uint))
     }
     
     mutating func write(uint: UInt8) {
