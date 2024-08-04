@@ -1,12 +1,11 @@
 import Foundation
 
 /// An ``Encoder`` that encodes ``Encodable`` types into msgpack-serialized bytes.
-class MPEncoder: Encoder {
-    var codingPath: [any CodingKey] = []
+public class MPEncoder: Encoder {
+    public let codingPath: [any CodingKey] = []
+    public let userInfo: [CodingUserInfoKey: Any] = [:]
     
-    var userInfo: [CodingUserInfoKey: Any] = [:]
-    
-    fileprivate var writer = MPWriter()
+    var writer = MPWriter()
     
     /// Encodes the given ``Encodable`` value into msgpack-serialized ``Data``.
     ///
@@ -33,21 +32,21 @@ class MPEncoder: Encoder {
         return data
     }
     
-    func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key: CodingKey {
+    public func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key: CodingKey {
         .init(MPKeyedEncodingContainer(referencing: self, writingTo: writer))
     }
     
-    func unkeyedContainer() -> any UnkeyedEncodingContainer {
+    public func unkeyedContainer() -> any UnkeyedEncodingContainer {
         MPUnkeyedEncodingContainer(referencing: self, writingTo: writer)
     }
     
-    func singleValueContainer() -> any SingleValueEncodingContainer {
+    public func singleValueContainer() -> any SingleValueEncodingContainer {
         MPSingleValueEncodingContainer(referencing: self, writingTo: writer)
     }
 }
 
-class MPKeyedEncodingContainer<Key: CodingKey>: KeyedEncodingContainerProtocol {
-    var codingPath: [any CodingKey] = []
+public class MPKeyedEncodingContainer<Key: CodingKey>: KeyedEncodingContainerProtocol {
+    public var codingPath: [any CodingKey] = []
     
     private var writer: MPWriter
     private let encoder: Encoder
@@ -62,97 +61,97 @@ class MPKeyedEncodingContainer<Key: CodingKey>: KeyedEncodingContainerProtocol {
         self.writer.completeMap()
     }
     
-    func encodeNil(forKey key: Key) throws {
+    public func encodeNil(forKey key: Key) throws {
         writer.write(string: key.stringValue)
         writer.writeNil()
     }
     
-    func encode(_ value: Bool, forKey key: Key) throws {
+    public func encode(_ value: Bool, forKey key: Key) throws {
         writer.write(string: key.stringValue)
         writer.write(bool: value)
     }
     
-    func encode(_ value: String, forKey key: Key) throws {
+    public func encode(_ value: String, forKey key: Key) throws {
         writer.write(string: key.stringValue)
         writer.write(string: value)
     }
     
-    func encode(_ value: Double, forKey key: Key) throws {
+    public func encode(_ value: Double, forKey key: Key) throws {
         writer.write(string: key.stringValue)
         writer.write(double: value)
     }
     
-    func encode(_ value: Float, forKey key: Key) throws {
+    public func encode(_ value: Float, forKey key: Key) throws {
         writer.write(string: key.stringValue)
         writer.write(float: value)
     }
     
-    func encode(_ value: Int, forKey key: Key) throws {
+    public func encode(_ value: Int, forKey key: Key) throws {
         writer.write(string: key.stringValue)
         writer.write(int: value)
     }
     
-    func encode(_ value: Int8, forKey key: Key) throws {
+    public func encode(_ value: Int8, forKey key: Key) throws {
         writer.write(string: key.stringValue)
         writer.write(int: value)
     }
     
-    func encode(_ value: Int16, forKey key: Key) throws {
+    public func encode(_ value: Int16, forKey key: Key) throws {
         writer.write(string: key.stringValue)
         writer.write(int: value)
     }
     
-    func encode(_ value: Int32, forKey key: Key) throws {
+    public func encode(_ value: Int32, forKey key: Key) throws {
         writer.write(string: key.stringValue)
         writer.write(int: value)
     }
     
-    func encode(_ value: Int64, forKey key: Key) throws {
+    public func encode(_ value: Int64, forKey key: Key) throws {
         writer.write(string: key.stringValue)
         writer.write(int: value)
     }
     
-    func encode(_ value: UInt, forKey key: Key) throws {
+    public func encode(_ value: UInt, forKey key: Key) throws {
         writer.write(string: key.stringValue)
         writer.write(uint: value)
     }
     
-    func encode(_ value: UInt8, forKey key: Key) throws {
+    public func encode(_ value: UInt8, forKey key: Key) throws {
         writer.write(string: key.stringValue)
         writer.write(uint: value)
     }
     
-    func encode(_ value: UInt16, forKey key: Key) throws {
+    public func encode(_ value: UInt16, forKey key: Key) throws {
         writer.write(string: key.stringValue)
         writer.write(uint: value)
     }
     
-    func encode(_ value: UInt32, forKey key: Key) throws {
+    public func encode(_ value: UInt32, forKey key: Key) throws {
         writer.write(string: key.stringValue)
         writer.write(uint: value)
     }
     
-    func encode(_ value: UInt64, forKey key: Key) throws {
+    public func encode(_ value: UInt64, forKey key: Key) throws {
         writer.write(string: key.stringValue)
         writer.write(uint: value)
     }
     
-    func encode<T>(_ value: T, forKey key: Key) throws where T: Encodable {
+    public func encode<T>(_ value: T, forKey key: Key) throws where T: Encodable {
         writer.write(string: key.stringValue)
         try value.encode(to: encoder)
     }
     
-    func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type, forKey key: Key) -> KeyedEncodingContainer<NestedKey> where NestedKey: CodingKey {
+    public func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type, forKey key: Key) -> KeyedEncodingContainer<NestedKey> where NestedKey: CodingKey {
         return KeyedEncodingContainer(MPKeyedEncodingContainer<NestedKey>(referencing: encoder, writingTo: writer))
     }
     
-    func nestedUnkeyedContainer(forKey key: Key) -> any UnkeyedEncodingContainer {
+    public func nestedUnkeyedContainer(forKey key: Key) -> any UnkeyedEncodingContainer {
         return MPUnkeyedEncodingContainer(referencing: encoder, writingTo: writer)
     }
     
-    func superEncoder() -> any Encoder { superEncoder(forKey: .init(stringValue: "super")!) }
+    public func superEncoder() -> any Encoder { superEncoder(forKey: .init(stringValue: "super")!) }
     
-    func superEncoder(forKey key: Key) -> any Encoder { encoder }
+    public func superEncoder(forKey key: Key) -> any Encoder { encoder }
 }
 
 class MPUnkeyedEncodingContainer: UnkeyedEncodingContainer {

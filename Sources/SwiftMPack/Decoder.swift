@@ -2,9 +2,9 @@ import CMPack
 import Foundation
 
 /// A ``Decoder`` that decodes msgpack-serialized bytes into ``Decodable`` structs.
-class MPDecoder: Decoder {
-    let codingPath: [any CodingKey] = []
-    let userInfo: [CodingUserInfoKey: Any] = [:]
+public class MPDecoder: Decoder {
+    public let codingPath: [any CodingKey] = []
+    public let userInfo: [CodingUserInfoKey: Any] = [:]
     
     fileprivate let reader: MPTreeReader
     fileprivate var codingNodes: [MPTreeReader.Node] = []
@@ -40,7 +40,7 @@ class MPDecoder: Decoder {
 
     fileprivate init(from reader: MPTreeReader) {
         self.reader = reader
-       codingNodes.append(reader.root)
+        codingNodes.append(reader.root)
     }
     
     fileprivate init(from reader: MPTreeReader, startingFrom node: MPTreeReader.Node) {
@@ -48,15 +48,15 @@ class MPDecoder: Decoder {
         codingNodes.append(node)
     }
     
-    func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
+    public func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
         return .init(MPKeyedDecodingContainer(referencing: self))
     }
     
-    func unkeyedContainer() throws -> any UnkeyedDecodingContainer {
+    public func unkeyedContainer() throws -> any UnkeyedDecodingContainer {
         MPUnkeyedDecodingContainer(referencing: self)
     }
     
-    func singleValueContainer() throws -> any SingleValueDecodingContainer {
+    public func singleValueContainer() throws -> any SingleValueDecodingContainer {
         MPSingleValueDecodingContainer(referencing: self)
     }
 }

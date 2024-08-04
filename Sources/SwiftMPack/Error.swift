@@ -1,5 +1,5 @@
 import Foundation
 
-enum MPError: Error {
+public enum MPError: Error {
     case unknownEncodingError
 }

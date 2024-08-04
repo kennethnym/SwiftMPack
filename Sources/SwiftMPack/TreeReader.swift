@@ -1,8 +1,8 @@
 import CMPack
 import Foundation
 
-class MPTreeReader {
-    typealias Node = mpack_node_t
+public class MPTreeReader {
+    public typealias Node = mpack_node_t
 
     private(set) var root = Node()
 
@@ -10,7 +10,7 @@ class MPTreeReader {
     private let bytes: [UInt8]
     private let dataPtr: UnsafePointer<CChar>
 
-    init?(readFrom data: Data) {
+    public init?(readFrom data: Data) {
         bytes = .init(data)
         dataPtr = bytes.withUnsafeBytes {
             $0.withMemoryRebound(to: CChar.self) { ptr in
@@ -29,15 +29,15 @@ class MPTreeReader {
         mpack_tree_destroy(&tree)
     }
 
-    func contains(_ key: String, in node: Node) -> Bool {
+    public func contains(_ key: String, in node: Node) -> Bool {
         mpack_node_map_contains_cstr(node, key)
     }
 
-    func isKeyNil(_ key: String, in node: Node) -> Bool {
+    public func isKeyNil(_ key: String, in node: Node) -> Bool {
         mpack_node_is_nil(mpack_node_map_cstr(node, key))
     }
 
-    func read(_ key: String, in node: Node) -> Int {
+    public func read(_ key: String, in node: Node) -> Int {
         let valueNode = mpack_node_map_cstr(node, key)
         let num: any SignedInteger = switch MemoryLayout<Int>.size {
         case 8: mpack_node_i8(valueNode)
@@ -49,23 +49,23 @@ class MPTreeReader {
         return Int(num)
     }
 
-    func read(_ key: String, in node: Node) -> Int8 {
+    public func read(_ key: String, in node: Node) -> Int8 {
         mpack_node_i8(mpack_node_map_cstr(node, key))
     }
 
-    func read(_ key: String, in node: Node) -> Int16 {
+    public func read(_ key: String, in node: Node) -> Int16 {
         mpack_node_i16(mpack_node_map_cstr(node, key))
     }
 
-    func read(_ key: String, in node: Node) -> Int32 {
+    public func read(_ key: String, in node: Node) -> Int32 {
         mpack_node_i32(mpack_node_map_cstr(node, key))
     }
 
-    func read(_ key: String, in node: Node) -> Int64 {
+    public func read(_ key: String, in node: Node) -> Int64 {
         mpack_node_i64(mpack_node_map_cstr(node, key))
     }
 
-    func read(_ key: String, in node: Node) -> UInt {
+    public func read(_ key: String, in node: Node) -> UInt {
         let valueNode = mpack_node_map_cstr(node, key)
         let num: any UnsignedInteger = switch MemoryLayout<UInt>.size {
         case 8: mpack_node_u8(valueNode)
@@ -77,35 +77,35 @@ class MPTreeReader {
         return UInt(num)
     }
 
-    func read(_ key: String, in node: Node) -> UInt8 {
+    public func read(_ key: String, in node: Node) -> UInt8 {
         mpack_node_u8(mpack_node_map_cstr(node, key))
     }
 
-    func read(_ key: String, in node: Node) -> UInt16 {
+    public func read(_ key: String, in node: Node) -> UInt16 {
         mpack_node_u16(mpack_node_map_cstr(node, key))
     }
 
-    func read(_ key: String, in node: Node) -> UInt32 {
+    public func read(_ key: String, in node: Node) -> UInt32 {
         mpack_node_u32(mpack_node_map_cstr(node, key))
     }
 
-    func read(_ key: String, in node: Node) -> UInt64 {
+    public func read(_ key: String, in node: Node) -> UInt64 {
         mpack_node_u64(mpack_node_map_cstr(node, key))
     }
 
-    func read(_ key: String, in node: Node) -> Bool {
+    public func read(_ key: String, in node: Node) -> Bool {
         mpack_node_bool(mpack_node_map_cstr(node, key))
     }
 
-    func read(_ key: String, in node: Node) -> Float {
+    public func read(_ key: String, in node: Node) -> Float {
         mpack_node_float(mpack_node_map_cstr(node, key))
     }
 
-    func read(_ key: String, in node: Node) -> Double {
+    public func read(_ key: String, in node: Node) -> Double {
         mpack_node_double(mpack_node_map_cstr(node, key))
     }
 
-    func read(_ key: String, in node: Node) -> String? {
+    public func read(_ key: String, in node: Node) -> String? {
         let valueNode = mpack_node_map_cstr(node, key)
         guard let ptr = mpack_node_str(valueNode) else {
             return nil
@@ -115,15 +115,15 @@ class MPTreeReader {
         return String(data: data, encoding: .utf8)
     }
 
-    func read(_ key: String, in node: Node) -> Node {
+    public func read(_ key: String, in node: Node) -> Node {
         mpack_node_map_cstr(node, key)
     }
 
-    func isArrayItemNil(_ i: Int, in arrayNode: Node) -> Bool {
+    public func isArrayItemNil(_ i: Int, in arrayNode: Node) -> Bool {
         mpack_node_is_nil(mpack_node_array_at(arrayNode, i))
     }
 
-    func readInArray(_ i: Int, in arrayNode: Node) -> Int {
+    public func readInArray(_ i: Int, in arrayNode: Node) -> Int {
         let itemNode = mpack_node_array_at(arrayNode, i)
         let num: any SignedInteger = switch MemoryLayout<Int>.size {
         case 8: mpack_node_i8(itemNode)
@@ -135,23 +135,23 @@ class MPTreeReader {
         return Int(num)
     }
 
-    func readInArray(_ i: Int, in arrayNode: Node) -> Int8 {
+    public func readInArray(_ i: Int, in arrayNode: Node) -> Int8 {
         mpack_node_i8(mpack_node_array_at(arrayNode, i))
     }
 
-    func readInArray(_ i: Int, in arrayNode: Node) -> Int16 {
+    public func readInArray(_ i: Int, in arrayNode: Node) -> Int16 {
         mpack_node_i16(mpack_node_array_at(arrayNode, i))
     }
 
-    func readInArray(_ i: Int, in arrayNode: Node) -> Int32 {
+    public func readInArray(_ i: Int, in arrayNode: Node) -> Int32 {
         mpack_node_i32(mpack_node_array_at(arrayNode, i))
     }
 
-    func readInArray(_ i: Int, in arrayNode: Node) -> Int64 {
+    public func readInArray(_ i: Int, in arrayNode: Node) -> Int64 {
         mpack_node_i64(mpack_node_array_at(arrayNode, i))
     }
 
-    func readInArray(_ i: Int, in arrayNode: Node) -> UInt {
+    public func readInArray(_ i: Int, in arrayNode: Node) -> UInt {
         let itemNode = mpack_node_array_at(arrayNode, i)
         let num: any UnsignedInteger = switch MemoryLayout<UInt>.size {
         case 8: mpack_node_u8(itemNode)
@@ -163,39 +163,39 @@ class MPTreeReader {
         return UInt(num)
     }
 
-    func readArrayLength(of node: Node) -> Int {
+    public func readArrayLength(of node: Node) -> Int {
         mpack_node_array_length(node)
     }
 
-    func readInArray(_ i: Int, in arrayNode: Node) -> UInt8 {
+    public func readInArray(_ i: Int, in arrayNode: Node) -> UInt8 {
         mpack_node_u8(mpack_node_array_at(arrayNode, i))
     }
 
-    func readInArray(_ i: Int, in arrayNode: Node) -> UInt16 {
+    public func readInArray(_ i: Int, in arrayNode: Node) -> UInt16 {
         mpack_node_u16(mpack_node_array_at(arrayNode, i))
     }
 
-    func readInArray(_ i: Int, in arrayNode: Node) -> UInt32 {
+    public func readInArray(_ i: Int, in arrayNode: Node) -> UInt32 {
         mpack_node_u32(mpack_node_array_at(arrayNode, i))
     }
 
-    func readInArray(_ i: Int, in arrayNode: Node) -> UInt64 {
+    public func readInArray(_ i: Int, in arrayNode: Node) -> UInt64 {
         mpack_node_u64(mpack_node_array_at(arrayNode, i))
     }
 
-    func readInArray(_ i: Int, in arrayNode: Node) -> Bool {
+    public func readInArray(_ i: Int, in arrayNode: Node) -> Bool {
         mpack_node_bool(mpack_node_array_at(arrayNode, i))
     }
 
-    func readInArray(_ i: Int, in arrayNode: Node) -> Float {
+    public func readInArray(_ i: Int, in arrayNode: Node) -> Float {
         mpack_node_float(mpack_node_array_at(arrayNode, i))
     }
 
-    func readInArray(_ i: Int, in arrayNode: Node) -> Double {
+    public func readInArray(_ i: Int, in arrayNode: Node) -> Double {
         mpack_node_double(mpack_node_array_at(arrayNode, i))
     }
 
-    func readInArray(_ i: Int, in arrayNode: Node) -> String? {
+    public func readInArray(_ i: Int, in arrayNode: Node) -> String? {
         let itemNode = mpack_node_array_at(arrayNode, i)
         guard let ptr = mpack_node_str(itemNode) else {
             return nil
@@ -205,7 +205,7 @@ class MPTreeReader {
         return String(data: data, encoding: .utf8)
     }
 
-    func readInArray(_ i: Int, in arrayNode: Node) -> Node {
+    public func readInArray(_ i: Int, in arrayNode: Node) -> Node {
         mpack_node_array_at(arrayNode, i)
     }
 }
