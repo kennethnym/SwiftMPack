@@ -142,10 +142,12 @@ public class MPKeyedEncodingContainer<Key: CodingKey>: KeyedEncodingContainerPro
     }
     
     public func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type, forKey key: Key) -> KeyedEncodingContainer<NestedKey> where NestedKey: CodingKey {
+        writer.write(string: key.stringValue)
         return KeyedEncodingContainer(MPKeyedEncodingContainer<NestedKey>(referencing: encoder, writingTo: writer))
     }
     
     public func nestedUnkeyedContainer(forKey key: Key) -> any UnkeyedEncodingContainer {
+        writer.write(string: key.stringValue)
         return MPUnkeyedEncodingContainer(referencing: encoder, writingTo: writer)
     }
     
