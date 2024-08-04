@@ -32,10 +32,20 @@ class MPDecoder: Decoder {
         let decoder = MPDecoder(from: reader)
         return try .init(from: decoder)
     }
+    
+    static func decode<T: Decodable>(_ type: T.Type, with reader: MPTreeReader, from node: MPTreeReader.Node) throws -> T {
+        let decoder = MPDecoder(from: reader, startingFrom: node)
+        return try .init(from: decoder)
+    }
 
     fileprivate init(from reader: MPTreeReader) {
         self.reader = reader
-        codingNodes.append(reader.root)
+       codingNodes.append(reader.root)
+    }
+    
+    fileprivate init(from reader: MPTreeReader, startingFrom node: MPTreeReader.Node) {
+        self.reader = reader
+        codingNodes.append(node)
     }
     
     func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
