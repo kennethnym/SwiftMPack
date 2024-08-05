@@ -38,15 +38,7 @@ public class MPTreeReader {
     }
 
     public func read(_ key: String, in node: Node) -> Int {
-        let valueNode = mpack_node_map_cstr(node, key)
-        let num: any SignedInteger = switch MemoryLayout<Int>.size {
-        case 8: mpack_node_i8(valueNode)
-        case 16: mpack_node_i16(valueNode)
-        case 32: mpack_node_i32(valueNode)
-        case 64: mpack_node_i64(valueNode)
-        default: fatalError()
-        }
-        return Int(num)
+        return Int(mpack_node_int(mpack_node_map_cstr(node, key)))
     }
 
     public func read(_ key: String, in node: Node) -> Int8 {
@@ -124,15 +116,7 @@ public class MPTreeReader {
     }
 
     public func readInArray(_ i: Int, in arrayNode: Node) -> Int {
-        let itemNode = mpack_node_array_at(arrayNode, i)
-        let num: any SignedInteger = switch MemoryLayout<Int>.size {
-        case 8: mpack_node_i8(itemNode)
-        case 16: mpack_node_i16(itemNode)
-        case 32: mpack_node_i32(itemNode)
-        case 64: mpack_node_i64(itemNode)
-        default: fatalError()
-        }
-        return Int(num)
+        return Int(mpack_node_int(mpack_node_array_at(arrayNode, i)))
     }
 
     public func readInArray(_ i: Int, in arrayNode: Node) -> Int8 {
