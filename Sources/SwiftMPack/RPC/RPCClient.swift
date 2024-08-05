@@ -1,23 +1,6 @@
 import Foundation
 
-private struct MPRPCRequest: Encodable {
-    let msgid: MessageID
-    let method: String
-    let params: [any Codable]
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.unkeyedContainer()
-        try container.encode(RPCMessageType.request.rawValue)
-        try container.encode(msgid)
-        try container.encode(method)
-        var paramsContainer = container.nestedUnkeyedContainer()
-        try params.forEach {
-            try paramsContainer.encode($0)
-        }
-    }
-}
-
-private enum MPRPCResponse {
+private enum PendingRequestResult {
     /// The RPC server returned an error for this RPC call.
     case error
 
@@ -26,13 +9,10 @@ private enum MPRPCResponse {
     case ok(MPTreeReader, MPTreeReader.Node)
 }
 
-private typealias MessageID = UInt32
-private typealias ResponseHandler = (MPRPCResponse) -> Void
-
-struct MPRPCCallError: Error {}
+private typealias PendingRequestCallback = (PendingRequestResult) -> Void
 
 public class MPRPCClient {
-    private var pendingRequest: [MessageID: ResponseHandler] = [:]
+    private var pendingRequest: [MessageID: PendingRequestCallback] = [:]
     private var channel: MPRPCChannel
 
     public init(over channel: MPRPCChannel) {
@@ -46,7 +26,7 @@ public class MPRPCClient {
         let encoded = try MPEncoder.encode(request)
         let group = DispatchGroup()
         var maybeResult: CallResult?
-        pendingRequest[msgid] = { (response: MPRPCResponse) in
+        pendingRequest[msgid] = { (response: PendingRequestResult) in
             maybeResult = switch response {
             case .error: nil
             case .ok(let reader, let node):
@@ -70,7 +50,7 @@ public class MPRPCClient {
         let request = MPRPCRequest(msgid: msgid, method: method, params: args)
         let encoded = try MPEncoder.encode(request)
 
-        pendingRequest[msgid] = { (response: MPRPCResponse) in
+        pendingRequest[msgid] = { (response: PendingRequestResult) in
             switch response {
             case .error:
                 completionHandler(nil)
@@ -79,20 +59,20 @@ public class MPRPCClient {
                 completionHandler(try? MPDecoder.decode(CallResult.self, with: reader, from: node))
             }
         }
-        
+
         channel.send(data: encoded)
     }
 
-    @available(macOS 10.15, *)
+    @available(iOS 13, macOS 10.15, *)
     public func call<CallResult: Decodable>(_ method: String, _ args: Codable...) async throws -> CallResult {
         let msgid = newMessageID()
         let request = MPRPCRequest(msgid: msgid, method: method, params: args)
         let encoded = try MPEncoder.encode(request)
-        
+
         channel.send(data: encoded)
-        
+
         return try await withCheckedThrowingContinuation { continuation in
-            pendingRequest[msgid] = { (response: MPRPCResponse) in
+            pendingRequest[msgid] = { (response: PendingRequestResult) in
                 switch response {
                 case .error:
                     continuation.resume(throwing: MPRPCCallError())
