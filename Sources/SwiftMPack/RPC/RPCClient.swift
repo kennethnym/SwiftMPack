@@ -44,11 +44,8 @@ public class MPRPCClient {
         let msgid = newMessageID()
         let request = MPRPCRequest(msgid: msgid, method: method, params: args)
         let encoded = try MPEncoder.encode(request)
-
         let group = DispatchGroup()
         var maybeResult: CallResult?
-
-        group.enter()
         pendingRequest[msgid] = { (response: MPRPCResponse) in
             maybeResult = switch response {
             case .error: nil
@@ -57,6 +54,9 @@ public class MPRPCClient {
             }
             group.leave()
         }
+
+        channel.send(data: encoded)
+        group.enter()
         group.wait()
 
         guard let result = maybeResult else {
@@ -65,12 +65,32 @@ public class MPRPCClient {
         return result
     }
 
+    public func call<CallResult: Decodable>(_ method: String, _ args: Codable..., completionHandler: @escaping (CallResult?) -> Void) throws {
+        let msgid = newMessageID()
+        let request = MPRPCRequest(msgid: msgid, method: method, params: args)
+        let encoded = try MPEncoder.encode(request)
+
+        pendingRequest[msgid] = { (response: MPRPCResponse) in
+            switch response {
+            case .error:
+                completionHandler(nil)
+
+            case .ok(let reader, let node):
+                completionHandler(try? MPDecoder.decode(CallResult.self, with: reader, from: node))
+            }
+        }
+        
+        channel.send(data: encoded)
+    }
+
     @available(macOS 10.15, *)
     public func call<CallResult: Decodable>(_ method: String, _ args: Codable...) async throws -> CallResult {
         let msgid = newMessageID()
         let request = MPRPCRequest(msgid: msgid, method: method, params: args)
         let encoded = try MPEncoder.encode(request)
-
+        
+        channel.send(data: encoded)
+        
         return try await withCheckedThrowingContinuation { continuation in
             pendingRequest[msgid] = { (response: MPRPCResponse) in
                 switch response {
