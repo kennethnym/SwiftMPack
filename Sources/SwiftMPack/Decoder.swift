@@ -25,7 +25,7 @@ public class MPDecoder: Decoder {
     /// - parameter data: The msgpack-formatted ``Data`` to be decoded.
     ///
     /// - returns: The decoded data in the given type.
-    static func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
+    public static func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
         guard let reader = MPTreeReader(readFrom: data) else {
             throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Unable to decode: invalid mpack data!!"))
         }

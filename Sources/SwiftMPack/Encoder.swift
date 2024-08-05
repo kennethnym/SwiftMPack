@@ -23,7 +23,7 @@ public class MPEncoder: Encoder {
     /// - parameter value: The value to be encoded
     ///
     /// - returns: The value serialized as msgpack ``Data``.
-    static func encode<T: Encodable>(_ value: T) throws -> Data {
+    public static func encode<T: Encodable>(_ value: T) throws -> Data {
         let encoder = MPEncoder()
         try value.encode(to: encoder)
         guard let data = encoder.writer.getDataAndDestroy() else {
